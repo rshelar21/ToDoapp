@@ -6,7 +6,7 @@ var cors = require('cors')
 const todomodel = require("./models/Items");
 const Pusher = require('pusher');
 // require('dotenv').config({path: './.env'})
-require('dotenv').config({path: '.env'});
+require('dotenv').config({path: '../.env'});
 
 console.log(process.env.DATABASE_URL);
 
@@ -74,7 +74,7 @@ app.get("/items/get", (req, res)=>{
 })
 
 app.post("/items/post", (req, res)=>{
-    console.log(req.body);
+    console.log(`req body` , req.body);
     const todo = new todomodel(req.body);
     todo.save().then(()=>{
         res.send(todo);
@@ -83,6 +83,53 @@ app.post("/items/post", (req, res)=>{
     })
     // res.send("xax")
 })
+
+
+app.patch('/items/update/:id' , (req, res) => {
+    const id = req.params.id;
+    console.log(req.body);
+    todomodel.findByIdAndUpdate(id, { $set:
+        {
+            todos: req.body.todos
+        }
+    },
+    {new : true}).then((data) => {
+        res.send(`updated: ${data}`);
+    })
+    .catch((err) => {
+        res.send(`error: ${err}`);
+    })
+})
+
+
+
+
+
+
+app.delete("/items/delete/:id" , async(req, res) => {
+    const id = req.params.id;
+
+    todomodel.findByIdAndDelete(id)
+    .then((data) => {
+        res.send(`deleted: ${data}`);
+    })
+    .catch((err) => {
+        res.send(`error: ${err}`);
+    })
+    
+
+})
+
+
+
+
+if(process.env.NODE_ENV === 'production'){
+    const path = require('path');
+    app.get('/', (req, res)=>{
+        app.use(express.static('client/build'));
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+    })
+}
 
 app.listen(port, ()=>{
     console.log(`Server is running on port ${port}`)
