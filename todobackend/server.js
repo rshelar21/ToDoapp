@@ -63,7 +63,7 @@ db.once("open", ()=>{
 
 
 
-app.get("/items/get", (req, res)=>{
+app.get("https://to-doapp-alpha.vercel.app/items/get", (req, res)=>{
     // res.send("dcxs")
     const data = todomodel.find().then((data)=>{
         res.send(data);
